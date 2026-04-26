@@ -17,26 +17,16 @@
       background-color: #2e3a47;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 48px 24px;
-    }
-
-    /* ── Page layout: image+tile in row, brand below image ── */
-    .layout {
-      display: grid;
-      grid-template-columns: auto auto;
-      grid-template-rows: auto auto;
-      column-gap: 28px;
-      row-gap: 20px;
+      padding: 24px 16px;
+      gap: 16px;
     }
 
     /* ── Main WolleLabs image ── */
     .main-image {
-      grid-column: 1;
-      grid-row: 1;
-      max-width: 80vw;
-      max-height: 80vh;
+      width: 100%;
+      max-width: 500px;
       border-radius: 8px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       display: block;
@@ -44,40 +34,68 @@
 
     /* ── Brand text ── */
     .brand {
-      grid-column: 1;
-      grid-row: 2;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .brand span {
       font-family: 'Exo 2', sans-serif;
-      font-size: 3.5rem;
+      font-size: 2.5rem;
       font-weight: 900;
       color: #f0ebe0;
       text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 0, 0, 0.4);
-      letter-spacing: 6px;
+      letter-spacing: 10px;
       text-transform: uppercase;
-      text-align: center;
+      white-space: nowrap;
     }
 
-    /* ── Demo tile column ── */
+    .brand::before,
+    .brand::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #f0ebe055);
+    }
+
+    .brand::after {
+      background: linear-gradient(to left, transparent, #f0ebe055);
+    }
+
+    /* ── App tiles row ── */
+    .app-tiles {
+      width: 100%;
+      max-width: 500px;
+    }
+
+    /* ── Demo tile: wraps icon col + options col in a row ── */
     .demo-tile {
-      grid-column: 2;
-      grid-row: 1;
-      align-self: start;
-      display: flex;
-      flex-direction: column;
+      display: inline-flex;
+      flex-direction: row;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
       cursor: pointer;
     }
 
-    /* ── App icon ── */
-    .demo-tile .icon-wrap {
-      width: 80px;
-      height: 80px;
+    /* ── Icon + label column ── */
+    .tile-icon-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .icon-wrap {
+      width: 72px;
+      height: 72px;
       border-radius: 16px;
       overflow: hidden;
       transition: box-shadow 0.3s ease;
     }
 
-    .demo-tile .icon-wrap img {
+    .icon-wrap img {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -95,10 +113,9 @@
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     }
 
-    /* ── App label ── */
     .demo-label {
       font-family: 'Exo 2', sans-serif;
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       font-weight: 700;
       color: #7a8e9a;
       letter-spacing: 2px;
@@ -119,23 +136,22 @@
       gap: 5px;
       opacity: 0;
       pointer-events: none;
-      transform: translateY(-4px);
+      transform: translateX(-6px);
       transition: opacity 0.2s ease, transform 0.2s ease;
-      width: 100%;
     }
 
     .demo-tile:hover .demo-options,
     .demo-tile.selected .demo-options {
       opacity: 1;
       pointer-events: all;
-      transform: translateY(0);
+      transform: translateX(0);
     }
 
     .demo-option {
       display: flex;
       align-items: center;
       gap: 7px;
-      padding: 5px 10px;
+      padding: 6px 12px;
       border-radius: 7px;
       background: rgba(255, 255, 255, 0.07);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -164,17 +180,20 @@
 </head>
 <body>
 
-  <div class="layout">
+  <img class="main-image" src="img/wollelabs.png" alt="WolleLabs">
 
-    <img class="main-image" src="img/wollelabs.png" alt="WolleLabs">
+  <div class="brand"><span>WolleLabs</span></div>
 
-    <div class="brand">WolleLabs</div>
-
+  <div class="app-tiles">
     <div class="demo-tile" id="tile-snooptheday">
-      <div class="icon-wrap">
-        <img src="img/snooptheday.png" alt="SnoopTheDay">
+
+      <div class="tile-icon-col">
+        <div class="icon-wrap">
+          <img src="img/snooptheday.png" alt="SnoopTheDay">
+        </div>
+        <div class="demo-label">SnoopTheDay</div>
       </div>
-      <div class="demo-label">SnoopTheDay</div>
+
       <div class="demo-options">
         <a class="demo-option" href="https://play.google.com/store/apps/details?id=de.wollelabs.snooptheday" target="_blank">
           <i class="fa-brands fa-google-play"></i> Play Store
@@ -186,8 +205,8 @@
           <i class="fa-solid fa-shield-halved"></i> Privacy
         </a>
       </div>
-    </div>
 
+    </div>
   </div>
 
   <script>
