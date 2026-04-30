@@ -210,13 +210,30 @@
   </div>
 
   <script>
+    let isTouchDevice = false;
+    window.addEventListener('touchstart', () => { isTouchDevice = true; }, { once: true });
+
     document.querySelectorAll('.demo-tile').forEach(tile => {
+
+      // Toggle selected on click/tap (icon area only)
       tile.addEventListener('click', e => {
         if (e.target.closest('.demo-option')) return;
         const isSelected = tile.classList.contains('selected');
         document.querySelectorAll('.demo-tile').forEach(t => t.classList.remove('selected'));
         if (!isSelected) tile.classList.add('selected');
       });
+
+      // Hover only on non-touch devices
+      tile.addEventListener('mouseenter', () => {
+        if (isTouchDevice) return;
+        tile.classList.add('selected');
+      });
+
+      tile.addEventListener('mouseleave', () => {
+        if (isTouchDevice) return;
+        tile.classList.remove('selected');
+      });
+
     });
   </script>
 
