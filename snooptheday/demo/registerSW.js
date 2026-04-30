@@ -1,1 +1,1 @@
-if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/wollelabs-site/snooptheday/demo/sw.js', { scope: '/wollelabs-site/snooptheday/demo/' })})}
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/snooptheday/demo/sw.js', { scope: '/snooptheday/demo/' })})}
