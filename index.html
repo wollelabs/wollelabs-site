@@ -211,19 +211,20 @@
 
   <script>
     let isTouchDevice = false;
-    window.addEventListener('touchstart', () => { isTouchDevice = true; }, { once: true });
 
     document.querySelectorAll('.demo-tile').forEach(tile => {
 
-      // Toggle selected on click/tap (icon area only)
-      tile.addEventListener('click', e => {
-        if (e.target.closest('.demo-option')) return;
+      // Touch: use touchend directly and suppress synthetic mouse events
+      tile.addEventListener('touchend', e => {
+        isTouchDevice = true;
+        if (e.target.closest('.demo-option')) return; // let links work normally
+        e.preventDefault(); // suppress synthetic mouseenter/click
         const isSelected = tile.classList.contains('selected');
         document.querySelectorAll('.demo-tile').forEach(t => t.classList.remove('selected'));
         if (!isSelected) tile.classList.add('selected');
       });
 
-      // Hover only on non-touch devices
+      // Mouse hover (desktop only)
       tile.addEventListener('mouseenter', () => {
         if (isTouchDevice) return;
         tile.classList.add('selected');
