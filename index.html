@@ -14,7 +14,7 @@
     }
 
     body {
-      background-color: #2e3a47;
+      background-color: #fef3e2;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -28,7 +28,7 @@
       width: 100%;
       max-width: 500px;
       border-radius: 8px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
       display: block;
     }
 
@@ -45,8 +45,8 @@
       font-family: 'Exo 2', sans-serif;
       font-size: 2.5rem;
       font-weight: 900;
-      color: #f0ebe0;
-      text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 0, 0, 0.4);
+      color: #1c0a00;
+      text-shadow: 2px 3px 6px rgba(160, 74, 32, 0.35), 0 1px 2px rgba(0, 0, 0, 0.15);
       letter-spacing: 10px;
       text-transform: uppercase;
       white-space: nowrap;
@@ -57,11 +57,11 @@
       content: '';
       flex: 1;
       height: 1px;
-      background: linear-gradient(to right, transparent, #f0ebe055);
+      background: linear-gradient(to right, transparent, #d46b3055);
     }
 
     .brand::after {
-      background: linear-gradient(to left, transparent, #f0ebe055);
+      background: linear-gradient(to left, transparent, #d46b3055);
     }
 
     /* ── App tiles row ── */
@@ -110,14 +110,14 @@
 
     .demo-tile:hover .icon-wrap,
     .demo-tile.selected .icon-wrap {
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 4px 16px rgba(212, 107, 48, 0.3);
     }
 
     .demo-label {
       font-family: 'Exo 2', sans-serif;
       font-size: 0.6rem;
       font-weight: 700;
-      color: #7a8e9a;
+      color: #a04a20;
       letter-spacing: 2px;
       text-transform: uppercase;
       transition: color 0.3s ease;
@@ -126,7 +126,7 @@
 
     .demo-tile:hover .demo-label,
     .demo-tile.selected .demo-label {
-      color: #f0ebe0;
+      color: #1c0a00;
     }
 
     /* ── Options panel ── */
@@ -153,9 +153,9 @@
       gap: 7px;
       padding: 6px 12px;
       border-radius: 7px;
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #c8d8e4;
+      background: rgba(212, 107, 48, 0.08);
+      border: 1px solid #fed7aa;
+      color: #a04a20;
       text-decoration: none;
       font-family: 'Exo 2', sans-serif;
       font-size: 0.65rem;
@@ -173,8 +173,8 @@
     }
 
     .demo-option:hover {
-      background: rgba(255, 255, 255, 0.15);
-      color: #f0ebe0;
+      background: rgba(212, 107, 48, 0.18);
+      color: #1c0a00;
     }
   </style>
 </head>
