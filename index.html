@@ -236,6 +236,13 @@
       });
 
     });
+
+    // Deselect all tiles when returning to tab (e.g. after opening a link)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        document.querySelectorAll('.demo-tile').forEach(t => t.classList.remove('selected'));
+      }
+    });
   </script>
 
 </body>
