@@ -1,0 +1,1 @@
+import{a as e}from"./index-C-cF9e91.js";var t=class extends e{async open(){return new Promise((e,t)=>{t(Error(`Not implemented for web.`))})}async openAndroid(){return new Promise((e,t)=>{t(Error(`Not implemented for web.`))})}async openIOS(){return new Promise((e,t)=>{t(Error(`Not implemented for web.`))})}};export{t as NativeSettingsWeb};
