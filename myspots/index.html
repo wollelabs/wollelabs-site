@@ -6,48 +6,94 @@
 <title>Viewpoint Finder – Mühldorf am Inn</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-  html, body { margin:0; padding:0; height:100%;
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; height:100%; overflow:hidden;
     font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+
+  /* ---- Desktop layout ---- */
   #map { position:absolute; top:0; bottom:0; left:0; right:370px; }
   #sidebar {
     position:absolute; top:0; right:0; width:370px; height:100%;
-    box-sizing:border-box; overflow-y:auto;
-    background:#f7f7f5; border-left:1px solid #ddd; padding:14px 16px;
+    overflow-y:auto; background:#f7f7f5;
+    border-left:1px solid #ddd; padding:14px 16px;
   }
+  #sheet-handle { display:none; }
+
+  /* ---- Mobile layout (≤ 700px) ---- */
+  @media (max-width:700px) {
+    #map { right:0; bottom:0; }
+
+    #sidebar {
+      position:fixed; bottom:0; left:0; right:0; top:auto;
+      width:100%; height:72vh;
+      border-left:none; border-top:none;
+      border-radius:18px 18px 0 0;
+      box-shadow:0 -4px 20px rgba(0,0,0,.18);
+      padding:0 14px 20px;
+      overflow-y:auto;
+      transform:translateY(calc(100% - 52px));
+      transition:transform .3s cubic-bezier(.4,0,.2,1);
+      z-index:1000;
+    }
+    #sidebar.open { transform:translateY(0); }
+
+    #sheet-handle {
+      display:flex; align-items:center; justify-content:space-between;
+      position:sticky; top:0; background:#f7f7f5;
+      border-radius:18px 18px 0 0;
+      padding:10px 4px 8px; margin:0 -14px; padding-left:14px; padding-right:14px;
+      cursor:pointer; user-select:none; z-index:2; flex-shrink:0;
+    }
+    #sheet-handle::before {
+      content:''; position:absolute; top:6px; left:50%; transform:translateX(-50%);
+      width:36px; height:4px; background:#ccc; border-radius:2px;
+    }
+    #sheet-chevron { font-size:18px; color:#888; transition:transform .3s; line-height:1; }
+    #sidebar.open #sheet-chevron { transform:rotate(180deg); }
+    #sheet-title { font-size:14px; font-weight:600; color:#333; margin-top:2px; }
+
+    /* Tighter spacing on mobile */
+    h1 { display:none; }
+    .subtitle { display:none; }
+    .subtitle { font-size:11px; margin-bottom:7px; }
+    .layer-card { padding:6px 8px; margin-bottom:6px; font-size:11px; }
+    .layer-card b { font-size:12px; }
+    h2 { font-size:12px; margin:7px 0 3px; }
+    #rank-list { max-height:140px; font-size:12px; }
+    #rank-list li { padding:6px 8px; min-height:40px; }
+    #polar { height:220px; }
+    .click-hint { font-size:11px; padding:4px 7px; }
+    .stat { padding:3px 0; font-size:12px; }
+  }
+
+  /* ---- Shared styles ---- */
   h1 { font-size:17px; margin:0 0 3px; }
   .subtitle { font-size:12px; color:#777; margin-bottom:10px; }
 
-  /* Layer legend cards */
   .layer-card {
     background:#fff; border:1px solid #e0e0e0; border-radius:6px;
     padding:8px 10px; margin-bottom:8px; font-size:12px; line-height:1.5;
   }
   .layer-card b { display:block; margin-bottom:3px; font-size:13px; }
-  .layer-card .bar {
-    height:9px; border-radius:3px; margin:3px 0 1px;
-  }
-  .bar-rainbow {
-    background:linear-gradient(to right,
-      hsl(240,100%,50%),hsl(180,100%,45%),hsl(120,100%,40%),
-      hsl(60,100%,45%),hsl(0,100%,50%));
-  }
+  .layer-card .bar { height:9px; border-radius:3px; margin:3px 0 1px; }
+  .bar-rainbow { background:linear-gradient(to right,
+    hsl(240,100%,50%),hsl(180,100%,45%),hsl(120,100%,40%),
+    hsl(60,100%,45%),hsl(0,100%,50%)); }
   .bar-green { background:linear-gradient(to right,#fff,#2ca02c); }
-  .bar-labels { display:flex; justify-content:space-between;
-    font-size:10px; color:#888; }
+  .bar-labels { display:flex; justify-content:space-between; font-size:10px; color:#888; }
 
-  /* Rank list */
   h2 { font-size:13px; margin:10px 0 4px; }
   #rank-list { list-style:none; padding:0; margin:0; font-size:12px;
     max-height:200px; overflow-y:auto;
     border:1px solid #e0e0e0; border-radius:6px; background:#fff; }
   #rank-list li { padding:5px 8px; border-bottom:1px solid #eee;
-    cursor:pointer; display:flex; justify-content:space-between; }
-  #rank-list li:hover { background:#eef5ff; }
+    cursor:pointer; display:flex; justify-content:space-between;
+    align-items:center; }
+  #rank-list li:hover, #rank-list li:active { background:#eef5ff; }
   #rank-list li.active { background:#d8ebff; }
   .badge { display:inline-block; background:#2b6cb0; color:#fff;
     border-radius:10px; padding:1px 6px; font-size:11px; margin-right:4px; }
 
-  /* Detail panel */
   #detail { margin-top:8px; font-size:12px; }
   #detail h3 { font-size:13px; margin:4px 0 5px; }
   .stat { display:flex; justify-content:space-between;
@@ -55,21 +101,20 @@
   #polar { width:100%; height:290px; display:block; margin-top:8px;
     background:#fff; border-radius:6px; border:1px solid #e0e0e0; }
   .hint { color:#999; font-size:11px; margin-top:4px; }
+  .click-hint { font-size:11px; color:#888; background:#f0f4ff;
+    border:1px solid #c8d8ff; border-radius:5px; padding:5px 8px; margin-bottom:8px; }
+  .computing { color:#2b6cb0; font-style:italic; padding:10px 0; font-size:12px; }
 
-  /* Loading */
-  #loading { position:absolute; top:50%; left:calc(50% - 180px);
-    transform:translateY(-50%); background:rgba(255,255,255,.93);
-    padding:16px 24px; border-radius:8px; font-size:14px; z-index:9999;
-    box-shadow:0 2px 8px rgba(0,0,0,.2); text-align:center; }
+  /* Loading overlay */
+  #loading { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    background:rgba(255,255,255,.95); padding:16px 24px; border-radius:10px;
+    font-size:14px; z-index:9999; box-shadow:0 2px 12px rgba(0,0,0,.2);
+    text-align:center; max-width:90vw; }
   .spinner { display:inline-block; width:14px; height:14px;
     border:3px solid #ddd; border-top-color:#2b6cb0; border-radius:50%;
     animation:spin .8s linear infinite; margin-right:7px; vertical-align:middle; }
   @keyframes spin { to { transform:rotate(360deg); } }
   #load-status { font-size:12px; color:#666; margin-top:4px; }
-  .click-hint { font-size:11px; color:#888; background:#f0f4ff;
-    border:1px solid #c8d8ff; border-radius:5px; padding:5px 8px; margin-bottom:8px; }
-  .computing { color:#2b6cb0; font-style:italic; padding:10px 0; font-size:12px; }
-  #click-marker-label { font-size:11px; color:#555; }
 </style>
 </head>
 <body>
@@ -82,6 +127,10 @@
 <div id="map"></div>
 
 <div id="sidebar">
+  <div id="sheet-handle">
+    <span id="sheet-title">🏔 Viewpoint Finder</span>
+    <span id="sheet-chevron">⌃</span>
+  </div>
   <h1>🏔 Viewpoint Finder</h1>
   <div class="subtitle">Mühldorf am Inn, Bavaria · 15 km radius<br>
     SRTM 30 m DEM · earth-curvature corrected · 36 ray directions per cell</div>
@@ -407,6 +456,7 @@ fetch('viewpoints.geojson').then(r=>r.json()).then(geo => {
 
 // ---- Detail panel --------------------------------------------------------
 function showDetail(feature, marker) {
+  if (window.innerWidth <= 700) document.getElementById('sidebar').classList.add('open');
   const p = feature.properties;
   const [lon, lat] = feature.geometry.coordinates;
   document.querySelectorAll('#rank-list li').forEach(li=>li.classList.remove('active'));
@@ -478,6 +528,24 @@ function drawPolar(azimuths, horizon) {
   ctx.strokeStyle='rgba(44,130,201,.85)';
   ctx.lineWidth=1.5; ctx.fill(); ctx.stroke();
 }
+
+// ---- Mobile bottom sheet -------------------------------------------------
+(function() {
+  const sidebar = document.getElementById('sidebar');
+  const handle = document.getElementById('sheet-handle');
+  if (!handle) return;
+  handle.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+  });
+  // Auto-expand when detail is shown on mobile
+  const _origShowDetail = showDetail;
+  window._autoExpandSidebar = function() {
+    if (window.innerWidth <= 700) sidebar.classList.add('open');
+  };
+})();
+
+// Patch map click and list item clicks to auto-expand sidebar on mobile
+map.on('click', () => { if(window.innerWidth<=700) document.getElementById('sidebar').classList.add('open'); });
 </script>
 </body>
 </html>
