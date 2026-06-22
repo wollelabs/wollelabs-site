@@ -178,6 +178,19 @@ const topoBase = L.tileLayer('https://tile.opentopomap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 L.marker(CENTER).addTo(map).bindPopup('<b>Mühldorf am Inn</b><br>Search centre');
+
+// ---- Blue-dot: current position ------------------------------------------
+let _locDot = null, _locAcc = null;
+map.on('locationfound', e => {
+  if (_locDot) { _locDot.setLatLng(e.latlng); _locAcc.setLatLng(e.latlng).setRadius(e.accuracy); }
+  else {
+    _locAcc = L.circle(e.latlng, {radius:e.accuracy, color:'#4A90E2', weight:1,
+      fillColor:'#4A90E2', fillOpacity:.12}).addTo(map);
+    _locDot = L.circleMarker(e.latlng, {radius:8, color:'#fff', weight:2,
+      fillColor:'#4A90E2', fillOpacity:1}).addTo(map).bindPopup('You are here');
+  }
+});
+map.locate({watch:true, enableHighAccuracy:true});
 L.circle(CENTER, {radius:15000, color:'#555', weight:1,
                   fill:false, dashArray:'4 6'}).addTo(map);
 
