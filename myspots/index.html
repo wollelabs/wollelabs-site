@@ -181,16 +181,46 @@ L.marker(CENTER).addTo(map).bindPopup('<b>Mühldorf am Inn</b><br>Search centre'
 
 // ---- Blue-dot: current position ------------------------------------------
 let _locDot = null, _locAcc = null;
+
+function startLocate() {
+  map.stopLocate();
+  map.locate({watch:true, enableHighAccuracy:true, timeout:15000, maximumAge:0});
+}
+
 map.on('locationfound', e => {
-  if (_locDot) { _locDot.setLatLng(e.latlng); _locAcc.setLatLng(e.latlng).setRadius(e.accuracy); }
-  else {
+  const acc = Math.round(e.accuracy);
+  const popup = `📍 You are here<br><small>±${acc} m accuracy</small>`;
+  if (_locDot) {
+    _locDot.setLatLng(e.latlng).setPopupContent(popup);
+    _locAcc.setLatLng(e.latlng).setRadius(e.accuracy);
+  } else {
     _locAcc = L.circle(e.latlng, {radius:e.accuracy, color:'#4A90E2', weight:1,
       fillColor:'#4A90E2', fillOpacity:.12}).addTo(map);
     _locDot = L.circleMarker(e.latlng, {radius:8, color:'#fff', weight:2,
-      fillColor:'#4A90E2', fillOpacity:1}).addTo(map).bindPopup('You are here');
+      fillColor:'#4A90E2', fillOpacity:1, pane:'markerPane'})
+      .addTo(map).bindPopup(popup);
   }
 });
-map.locate({watch:true, enableHighAccuracy:true});
+
+map.on('locationerror', e => {
+  console.warn('Location error:', e.message);
+  // Show a small retryable toast
+  let toast = document.getElementById('_loc-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = '_loc-toast';
+    toast.style.cssText = 'position:absolute;bottom:70px;left:50%;transform:translateX(-50%);' +
+      'background:rgba(0,0,0,.72);color:#fff;padding:7px 14px;border-radius:20px;' +
+      'font-size:12px;z-index:2000;cursor:pointer;white-space:nowrap;';
+    toast.title = 'Tap to retry';
+    toast.addEventListener('click', () => { toast.remove(); startLocate(); });
+    document.getElementById('map').appendChild(toast);
+  }
+  toast.textContent = '⚠ Location unavailable — tap to retry';
+  setTimeout(() => toast && toast.remove(), 8000);
+});
+
+startLocate();
 L.circle(CENTER, {radius:15000, color:'#555', weight:1,
                   fill:false, dashArray:'4 6'}).addTo(map);
 
