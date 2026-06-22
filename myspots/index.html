@@ -542,19 +542,57 @@ function drawPolar(azimuths, horizon) {
   ctx.lineWidth=1.5; ctx.fill(); ctx.stroke();
 }
 
-// ---- Mobile bottom sheet -------------------------------------------------
+// ---- Mobile bottom sheet (drag + tap) ------------------------------------
 (function() {
   const sidebar = document.getElementById('sidebar');
-  const handle = document.getElementById('sheet-handle');
+  const handle  = document.getElementById('sheet-handle');
   if (!handle) return;
-  handle.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-  });
-  // Auto-expand when detail is shown on mobile
-  const _origShowDetail = showDetail;
-  window._autoExpandSidebar = function() {
-    if (window.innerWidth <= 700) sidebar.classList.add('open');
-  };
+
+  let startY = null, startOpen = null, dragging = false, moved = false;
+
+  function pointerStart(e) {
+    startY   = (e.touches ? e.touches[0] : e).clientY;
+    startOpen = sidebar.classList.contains('open');
+    dragging = true;
+    moved    = false;
+    sidebar.style.transition = 'none';
+  }
+
+  function pointerMove(e) {
+    if (!dragging) return;
+    const dy = (e.touches ? e.touches[0] : e).clientY - startY;
+    if (Math.abs(dy) > 4) {
+      moved = true;
+      e.preventDefault();
+    }
+    const sheetH = sidebar.offsetHeight;
+    const base   = startOpen ? 0 : sheetH - 52;
+    const clamped = Math.max(0, Math.min(sheetH - 52, base + dy));
+    sidebar.style.transform = `translateY(${clamped}px)`;
+  }
+
+  function pointerEnd(e) {
+    if (!dragging) return;
+    dragging = false;
+    sidebar.style.transition = '';
+    sidebar.style.transform  = '';
+
+    if (!moved) {
+      // Pure tap on handle
+      sidebar.classList.toggle('open');
+      return;
+    }
+    const dy = (e.changedTouches ? e.changedTouches[0] : e).clientY - startY;
+    if (startOpen)  sidebar.classList.toggle('open', dy < 60);   // drag down > 60px → close
+    else            sidebar.classList.toggle('open', dy < -60);  // drag up  > 60px → open
+  }
+
+  handle.addEventListener('touchstart',  pointerStart, {passive:true});
+  handle.addEventListener('touchmove',   pointerMove,  {passive:false});
+  handle.addEventListener('touchend',    pointerEnd);
+  handle.addEventListener('mousedown',   pointerStart);
+  window.addEventListener('mousemove',   pointerMove);
+  window.addEventListener('mouseup',     pointerEnd);
 })();
 
 // Patch map click and list item clicks to auto-expand sidebar on mobile
